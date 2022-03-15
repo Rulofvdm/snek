@@ -8,8 +8,10 @@ export class snek {
   direction: number;
   head: Piece;
   turning: boolean = false;
+  boundX: {min:number, max: number};
+  boundY: {min:number, max: number};
 
-  constructor(x: number, y: number, game_unit: number){
+  constructor(x: number, y: number, game_unit: number, boundX:{min: number, max: number}, boundY:{min: number, max: number}){
     this.segments =  [
       new Piece(
         x,
@@ -22,6 +24,8 @@ export class snek {
     this.game_unit = game_unit;
     this.direction = 0;
     this.head = this.segments[0];
+    this.boundX = boundX;
+    this.boundY = boundY;
   }
 
   size(): number {
@@ -35,10 +39,12 @@ export class snek {
   grow() {
     let tail = this.segments[this.length - 1];
     let position = get_position_facing(
-      (tail.direction + 2) % 4,
-      tail.x,
-      tail.y,
-      this.game_unit
+      {direction: (tail.direction + 2) % 4,
+      x: tail.x,
+      y: tail.y},
+      this.game_unit,
+      this.boundX,
+      this.boundY
     );
     let new_piece = new Piece(
       position.x,
@@ -58,10 +64,12 @@ export class snek {
       current_piece.y = previous_piece.y;
     }
     var new_head_position = get_position_facing(
-      this.head.direction,
-      this.head.x,
-      this.head.y,
-      this.game_unit
+      {direction: this.head.direction,
+      x: this.head.x,
+      y: this.head.y},
+      this.game_unit,
+      this.boundX,
+      this.boundY
     );
     this.head.x = new_head_position.x;
     this.head.y = new_head_position.y;

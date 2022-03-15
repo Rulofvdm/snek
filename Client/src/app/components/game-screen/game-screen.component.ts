@@ -15,8 +15,8 @@ export class GameScreenComponent implements OnInit {
   game_height_units: number = 40;
 
   canvas?: CanvasHandler;
-  width: any = this.game_unit * this.game_height_units;
-  height: any = this.game_unit * this.game_height_units;
+  boundX: {min:number, max: number} = {min: 0, max: this.game_unit * this.game_width_units};
+  boundY: {min:number, max: number} = {min: 0, max: this.game_unit * this.game_height_units};
 
   snack = this.random_snack();
   snek!: snek;
@@ -33,8 +33,8 @@ export class GameScreenComponent implements OnInit {
 
     let canvas = document.getElementById('game_canvas') as HTMLCanvasElement;
     this.canvas = new CanvasHandler(canvas);
-    this.canvas.setHeight(this.height);
-    this.canvas.setWidth(this.width);
+    this.canvas.setHeight(this.boundY.max);
+    this.canvas.setWidth(this.boundX.max);
 
     window.requestAnimationFrame(this.loop.bind(this));
   }
@@ -46,7 +46,6 @@ export class GameScreenComponent implements OnInit {
   random_snack() {
     let x = random(0, this.game_width_units - this.game_unit) * this.game_unit;
     let y = random(0, this.game_height_units - this.game_unit) * this.game_unit;
-    console.log(x + " " + y);
     return new Piece(
       x,
       y,
@@ -69,7 +68,13 @@ export class GameScreenComponent implements OnInit {
   }
 
   front_obstructed(piece: Piece) {
-    var position = get_position_facing(piece.direction, piece.x, piece.y, this.game_unit);
+    var position = get_position_facing(
+      {direction: piece.direction,
+      x: piece.x,
+      y: piece.y},
+      this.game_unit,
+      this.boundX,
+      this.boundY);
     if (this.snack.x == position.x && this.snack.y == position.y) {
       this.snack = this.random_snack();
       this.snek.grow();
@@ -90,8 +95,18 @@ export class GameScreenComponent implements OnInit {
     this.snek = new snek(
       this.middleUnit(this.game_width_units), //x
       this.middleUnit(this.game_height_units),
-      this.game_unit
+      this.game_unit,
+      this.boundX,
+      this.boundY
       );
+    this.snek.grow();
+    this.snek.grow();
+    this.snek.grow();
+    this.snek.grow();
+    this.snek.grow();
+    this.snek.grow();
+    this.snek.grow();
+    this.snek.grow();
     this.snek.grow();
     this.snack = this.random_snack();
   }
@@ -111,10 +126,10 @@ export class GameScreenComponent implements OnInit {
 
   loop() {
     if(!this.paused) window.requestAnimationFrame(this.loop.bind(this));
-    this.canvas!.clearBackground(this.width, this.height);
+    this.canvas!.clearBackground(this.boundX.max, this.boundY.max);
 
-    this.draw();
     this.update();
+    this.draw();
   }
 
   setControls() {
@@ -141,8 +156,10 @@ export class GameScreenComponent implements OnInit {
       }
     });
   }
+
   handlePause() {
     this.paused = !this.paused;
     if(!this.paused) window.requestAnimationFrame(this.loop.bind(this));
   }
+
 }
