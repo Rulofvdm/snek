@@ -149,6 +149,7 @@ export class GameScreenComponent implements OnInit {
           this.snek.turn(3);
           break;
         case 'Escape':
+        case ' ':
           this.handlePause();
           break;
         default:
