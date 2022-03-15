@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CanvasHandler } from './canvas_handler';
 import { Piece } from './game_piece_model';
+import { snek } from './snek';
+import { get_position_facing, random } from './utilities';
 
 @Component({
   selector: 'app-game-screen',
@@ -11,18 +13,19 @@ export class GameScreenComponent implements OnInit {
   game_unit: number = 10;
   game_width_units: number = 40;
   game_height_units: number = 40;
-  should_continue: boolean = true;
 
   canvas?: CanvasHandler;
   width: any = this.game_unit * this.game_height_units;
   height: any = this.game_unit * this.game_height_units;
 
-  snek = this.new_snek();
   snack = this.random_snack();
+  snek!: snek;
 
   last_update: Date = new Date();
 
-  constructor() {}
+  constructor() {
+    this.restart();
+  }
 
   ngOnInit(): void {
     this.setControls();
@@ -35,49 +38,23 @@ export class GameScreenComponent implements OnInit {
     window.requestAnimationFrame(this.loop.bind(this));
   }
 
-  random(min: number, max: number) {
-    const num = Math.floor(Math.random() * (max - min + 1)) + min;
-    return num;
-  }
-
-  middleX() {
-    return (this.game_width_units / 2) * this.game_unit;
-  }
-
-  middleY() {
-    return (this.game_height_units / 2) * this.game_unit;
-  }
-
-  new_snek() {
-    return [
-      new Piece(
-        this.middleX(), //x
-        this.middleY(), //y
-        'rgb(' +
-          this.random(0, 255) +
-          ',' +
-          this.random(0, 255) +
-          ',' +
-          this.random(0, 255) +
-          ')', //color
-        this.game_unit //size
-      ),
-    ];
+  middleUnit(num: number) {
+    return (num / 2) * this.game_unit;
   }
 
   random_snack() {
-    let x = this.random(0, this.game_width_units) * this.game_unit;
-    let y = this.random(0, this.game_height_units) * this.game_unit;
+    let x = random(0, this.game_width_units) * this.game_unit;
+    let y = random(0, this.game_height_units) * this.game_unit;
     console.log(x + " " + y);
     return new Piece(
       x,
       y,
       'rgb(' +
-        this.random(0, 255) +
+        random(0, 255) +
         ',' +
-        this.random(0, 255) +
+        random(0, 255) +
         ',' +
-        this.random(0, 255) +
+        random(0, 255) +
         ')',
       this.game_unit
     );
@@ -85,65 +62,21 @@ export class GameScreenComponent implements OnInit {
 
   draw() {
     this.canvas!.drawPiece(this.snack);
-    for (let i = 0; i < this.snek.length; i++) {
-      this.canvas!.drawPiece(this.snek[i]);
+    for (let i = 0; i < this.snek.size(); i++) {
+      this.canvas!.drawPiece(this.snek.getPiece(i));
     }
-  }
-
-  get_position_facing(direction: number, x: number, y: number) {
-    var new_position;
-    switch (direction) {
-      case 0:
-        new_position = { x: x, y: y - this.game_unit };
-        break;
-      case 1:
-        new_position = { x: x + this.game_unit, y: y };
-        break;
-      case 2:
-        new_position = { x: x, y: y + this.game_unit };
-        break;
-      case 3:
-        new_position = { x: x - this.game_unit, y: y };
-        break;
-      default:
-        new_position = { x: x, y: y };
-        break;
-    }
-    return new_position;
-  }
-
-  add_piece() {
-    let tail = this.snek[this.snek.length - 1];
-    let position = this.get_position_facing(
-      (tail.direction + 2) % 4,
-      tail.x,
-      tail.y
-    );
-    let new_piece = new Piece(
-      position.x,
-      position.y,
-      'rgb(' +
-        this.random(0, 255) +
-        ',' +
-        this.random(0, 255) +
-        ',' +
-        this.random(0, 255) +
-        ')', //color
-      this.game_unit
-    );
-    this.snek.push(new_piece);
   }
 
   front_obstructed(piece: Piece) {
-    var position = this.get_position_facing(piece.direction, piece.x, piece.y);
+    var position = get_position_facing(piece.direction, piece.x, piece.y, this.game_unit);
     if (this.snack.x == position.x && this.snack.y == position.y) {
       this.snack = this.random_snack();
-      this.add_piece();
+      this.snek.grow();
       return false;
     }
     if (this.snek.length > 1) {
       for (let i = 1; i < this.snek.length; i++) {
-        if (this.snek[i].x == position.x && this.snek[i].y == position.y) {
+        if (this.snek.getPiece(i).x == position.x && this.snek.getPiece(i).y == position.y) {
           return true;
         }
       }
@@ -152,33 +85,25 @@ export class GameScreenComponent implements OnInit {
   }
 
   restart() {
-    this.snek = this.new_snek();
+    this.snek = new snek(
+      this.middleUnit(this.game_width_units), //x
+      this.middleUnit(this.game_height_units),
+      this.game_unit
+      );
     this.snack = this.random_snack();
   }
 
   update() {
-    console.log(this.snek[0].x + " " + this.snek[0].y);
     let now = new Date;
     if (this.last_update > new Date(now.setMilliseconds(now.getMilliseconds() - 200)))
       return;
+    this.last_update = new Date();
 
-    if (this.front_obstructed(this.snek[0])) {
+    if (this.front_obstructed(this.snek.getPiece(0))) {
       this.restart();
     } else {
-      for (let i = this.snek.length - 1; i > 0; i--) {
-        this.snek[i].x = this.snek[i - 1].x;
-        this.snek[i].y = this.snek[i - 1].y;
-        this.snek[i].direction = this.snek[i - 1].direction;
-      }
-      var new_head_position = this.get_position_facing(
-        this.snek[0].direction,
-        this.snek[0].x,
-        this.snek[0].y
-      );
-      this.snek[0].x = new_head_position.x;
-      this.snek[0].y = new_head_position.y;
+      this.snek.move();
     }
-    this.last_update = new Date();
   }
 
   loop() {
@@ -194,26 +119,19 @@ export class GameScreenComponent implements OnInit {
       var new_direction;
       switch (e.key) {
         case 'ArrowUp':
-          new_direction = 0;
+          this.snek.turn(0);
           break;
         case 'ArrowRight':
-          new_direction = 1;
+          this.snek.turn(1);
           break;
         case 'ArrowDown':
-          new_direction = 2;
+          this.snek.turn(2);
           break;
         case 'ArrowLeft':
-          new_direction = 3;
+          this.snek.turn(3);
           break;
         default:
-          new_direction = this.snek[0].direction;
           break;
-      }
-      if (
-        (new_direction + 2) % 4 != this.snek[0].direction &&
-        new_direction != this.snek[0].direction
-      ) {
-        this.snek[0].direction = new_direction;
       }
     });
   }
