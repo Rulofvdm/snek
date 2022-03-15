@@ -87,6 +87,7 @@ export class snek {
       this.turning //if the snek is already turning
     ) return;
 
+    this.turning = true;
     this.head.direction = direction;
   }
 }
