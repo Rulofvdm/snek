@@ -22,6 +22,7 @@ export class GameScreenComponent implements OnInit {
   snek!: snek;
 
   last_update: Date = new Date();
+  paused: boolean = true;
 
   constructor() {
     this.restart();
@@ -95,7 +96,7 @@ export class GameScreenComponent implements OnInit {
 
   update() {
     let now = new Date;
-    if (this.last_update > new Date(now.setMilliseconds(now.getMilliseconds() - 200)))
+    if (this.last_update > new Date(now.setMilliseconds(now.getMilliseconds() - 100)))
       return;
     this.last_update = new Date();
 
@@ -107,7 +108,7 @@ export class GameScreenComponent implements OnInit {
   }
 
   loop() {
-    window.requestAnimationFrame(this.loop.bind(this));
+    if(!this.paused) window.requestAnimationFrame(this.loop.bind(this));
     this.canvas!.clearBackground(this.width, this.height);
 
     this.draw();
@@ -130,9 +131,16 @@ export class GameScreenComponent implements OnInit {
         case 'ArrowLeft':
           this.snek.turn(3);
           break;
+        case 'Escape':
+          this.handlePause();
+          break;
         default:
           break;
       }
     });
+  }
+  handlePause() {
+    this.paused = !this.paused;
+    if(!this.paused) window.requestAnimationFrame(this.loop.bind(this));
   }
 }
