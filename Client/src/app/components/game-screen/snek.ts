@@ -14,13 +14,7 @@ export class snek {
       new Piece(
         x,
         y,
-        'rgb(' +
-        random(0, 255) +
-        ',' +
-        random(0, 255) +
-        ',' +
-        random(0, 255) +
-        ')', //color
+        this.randomColor(), //color
         game_unit//size
       ),
     ];
@@ -49,13 +43,7 @@ export class snek {
     let new_piece = new Piece(
       position.x,
       position.y,
-      'rgb(' +
-        random(0, 255) +
-        ',' +
-        random(0, 255) +
-        ',' +
-        random(0, 255) +
-        ')', //color
+      this.randomColor(), //color
       this.game_unit
     );
     this.segments.push(new_piece);
@@ -89,5 +77,16 @@ export class snek {
 
     this.turning = true;
     this.head.direction = direction;
+  }
+
+  randomColor() {
+    // 255, 140, 105
+    return 'rgb(' +
+        random(255 - 60, 255) +
+        ',' +
+        random(140 - 30, 140 + 30) +
+        ',' +
+        random(105 - 30, 105 + 30) +
+        ')';
   }
 }

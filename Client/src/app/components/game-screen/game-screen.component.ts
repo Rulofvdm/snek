@@ -10,7 +10,7 @@ import { get_position_facing, random } from './utilities';
   styleUrls: ['./game-screen.component.css'],
 })
 export class GameScreenComponent implements OnInit {
-  game_unit: number = 10;
+  game_unit: number = 15;
   game_width_units: number = 40;
   game_height_units: number = 40;
 
@@ -44,8 +44,8 @@ export class GameScreenComponent implements OnInit {
   }
 
   random_snack() {
-    let x = random(0, this.game_width_units) * this.game_unit;
-    let y = random(0, this.game_height_units) * this.game_unit;
+    let x = random(0, this.game_width_units - this.game_unit) * this.game_unit;
+    let y = random(0, this.game_height_units - this.game_unit) * this.game_unit;
     console.log(x + " " + y);
     return new Piece(
       x,
@@ -73,6 +73,7 @@ export class GameScreenComponent implements OnInit {
     if (this.snack.x == position.x && this.snack.y == position.y) {
       this.snack = this.random_snack();
       this.snek.grow();
+      this.snek.grow();
       return false;
     }
     if (this.snek.length > 1) {
@@ -91,12 +92,13 @@ export class GameScreenComponent implements OnInit {
       this.middleUnit(this.game_height_units),
       this.game_unit
       );
+    this.snek.grow();
     this.snack = this.random_snack();
   }
 
   update() {
     let now = new Date;
-    if (this.last_update > new Date(now.setMilliseconds(now.getMilliseconds() - 100)))
+    if (this.last_update > new Date(now.setMilliseconds(now.getMilliseconds() - 150)))
       return;
     this.last_update = new Date();
 
