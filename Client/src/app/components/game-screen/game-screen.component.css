@@ -1,7 +1,24 @@
-canvas {
+.center {
   position: fixed;
   top: 50%;
   left: 50%;
-  /* bring your own prefixes */
   transform: translate(-50%, -50%);
+}
+
+#scoreDiv {
+  position: fixed;
+  left: 50%;
+  transform: translate(-50%);
+  color: antiquewhite;
+}
+
+#paused {
+  color: antiquewhite;
+}
+
+#shadow {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
 }

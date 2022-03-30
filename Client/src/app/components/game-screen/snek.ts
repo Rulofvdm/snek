@@ -79,11 +79,9 @@ export class snek {
   turn(direction: number): void {
     if (
       (direction + 2) % 4 == this.head.direction || //if new direction is behind
-      direction == this.head.direction || //if new direction is ahead
-      this.turning //if the snek is already turning
+      direction == this.head.direction //if new direction is ahead
     ) return;
 
-    this.turning = true;
     this.head.direction = direction;
   }
 

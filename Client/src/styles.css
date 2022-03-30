@@ -1,3 +1,15 @@
 html{
   background-color: #52231e;
 }
+
+html, body { height: 100%; }
+body { margin: 0; }
+
+* {
+  font-family: 'press-start-p2';
+}
+
+@font-face {
+  font-family: press-start-p2;
+  src: url(src/assets/fonts/PressStart2P-Regular.ttf) format("opentype");
+}

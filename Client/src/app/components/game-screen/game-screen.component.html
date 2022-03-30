@@ -1,1 +1,10 @@
-<canvas id="game_canvas" class="center-screen"></canvas>
+
+<canvas id="game_canvas" class="center"></canvas>
+<div id="scoreDiv">
+  <span>SCORE </span> <span id="score">{{this.score}}</span>
+</div>
+
+<div *ngIf="this.paused">
+  <span id="paused" class="center">PAUSED</span>
+  <div id="shadow"></div>
+</div>

@@ -13,19 +13,23 @@ export class GameScreenComponent implements OnInit {
   game_unit: number = 15;
   game_width_units: number = 40;
   game_height_units: number = 40;
+  score: number;
 
   canvas?: CanvasHandler;
   boundX: {min:number, max: number} = {min: 0, max: this.game_unit * this.game_width_units};
   boundY: {min:number, max: number} = {min: 0, max: this.game_unit * this.game_height_units};
 
-  snack = this.random_snack();
+  snack: any;
   snek!: snek;
 
   last_update: Date = new Date();
   paused: boolean = true;
 
+  lastCheatLetterNumber: number = 0;
+
   constructor() {
     this.restart();
+    this.score = 0;
   }
 
   ngOnInit(): void {
@@ -79,6 +83,7 @@ export class GameScreenComponent implements OnInit {
       this.snack = this.random_snack();
       this.snek.grow();
       this.snek.grow();
+      this.score++;
       return false;
     }
     if (this.snek.length > 1) {
@@ -101,14 +106,9 @@ export class GameScreenComponent implements OnInit {
       );
     this.snek.grow();
     this.snek.grow();
-    this.snek.grow();
-    this.snek.grow();
-    this.snek.grow();
-    this.snek.grow();
-    this.snek.grow();
-    this.snek.grow();
-    this.snek.grow();
     this.snack = this.random_snack();
+    this.score = 0;
+    this.paused = true;
   }
 
   update() {
@@ -153,6 +153,7 @@ export class GameScreenComponent implements OnInit {
           this.handlePause();
           break;
         default:
+          this.checkCheats(e.key);
           break;
       }
     });
@@ -163,4 +164,21 @@ export class GameScreenComponent implements OnInit {
     if(!this.paused) window.requestAnimationFrame(this.loop.bind(this));
   }
 
+  checkCheats(key: string) {
+    let fat = ['f','a','t'];
+    if (key == fat[this.lastCheatLetterNumber]) {
+      this.lastCheatLetterNumber++;
+    }
+    else {
+      this.lastCheatLetterNumber = 0;
+    }
+    if(this.lastCheatLetterNumber == 3) {
+      for (let index = 0; index < 20; index++) {
+        this.snek.grow();
+
+      }
+    }
+
+  }
 }
+

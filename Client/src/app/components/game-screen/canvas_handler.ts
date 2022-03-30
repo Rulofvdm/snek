@@ -24,7 +24,7 @@ export class CanvasHandler {
   }
 
   clearBackground(width: number, height: number) {
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
     this.ctx.fillRect(0, 0, width, height);
   }
 }
